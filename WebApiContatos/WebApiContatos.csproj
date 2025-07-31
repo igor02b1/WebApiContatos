@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ContatoApi.Application\ContatoApi.Application.csproj" />
     <ProjectReference Include="..\ContatoApi.Domain\ContatoApi.Domain.csproj" />
     <ProjectReference Include="..\ContatoApi.Infrastructure\ContatoApi.Infrastructure.csproj" />
