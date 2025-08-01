@@ -1,13 +1,11 @@
-﻿using ContatoApi.Application.Services;
-using ContatoApi.Domain.Models;
+﻿using ContatoApi.Domain.Models;
 using ContatoApi.Infrastructure.DataContext;
 using Microsoft.AspNetCore.Mvc;
-
-using ContatoApi.Application.Services;
 using ContatoApi.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ContatoApi.Application.Interfaces;
 
 namespace WebApiContatos.Controllers
 {
@@ -34,7 +32,10 @@ namespace WebApiContatos.Controllers
         {
             var response = await _contatoService.GetContatosById(id);
             if (!response.Sucesso)
+            {
                 return NotFound(response);
+            }
+                
             return Ok(response);
         }
 
@@ -43,16 +44,27 @@ namespace WebApiContatos.Controllers
         {
             var response = await _contatoService.CreateContatos(novoContato);
             if (!response.Sucesso)
+            {
                 return BadRequest(response);
+            }
+                
             return Ok(response);
         }
 
-        [HttpPut]
-        public async Task<ActionResult<Response<List<ContatoModel>>>> Update(ContatoModel contato)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> AtualizarContato(int id, [FromBody] ContatoModel contatoEditado)
         {
-            var response = await _contatoService.UpdateContatos(contato);
+            if (id != contatoEditado.Id)
+            {
+                return BadRequest("ID da URL não bate com o ID do corpo da requisição.");
+            }            
+
+            var response = await _contatoService.UpdateContatos(contatoEditado);
+
             if (!response.Sucesso)
-                return NotFound(response);
+            {
+                return BadRequest(response.Mensagem);
+            }               
             return Ok(response);
         }
 
@@ -61,7 +73,9 @@ namespace WebApiContatos.Controllers
         {
             var response = await _contatoService.DeleteContatos(id);
             if (!response.Sucesso)
-                return NotFound(response);
+            {
+                return BadRequest(response);
+            }                
             return Ok(response);
         }
 
@@ -70,7 +84,9 @@ namespace WebApiContatos.Controllers
         {
             var response = await _contatoService.InativaContatos(id);
             if (!response.Sucesso)
-                return NotFound(response);
+            {
+                return BadRequest(response);
+            }                
             return Ok(response);
         }
     }

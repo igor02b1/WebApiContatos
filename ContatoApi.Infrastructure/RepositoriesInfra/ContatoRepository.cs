@@ -16,7 +16,7 @@ namespace ContatoApi.Domain.Repositories
         public ContatoRepository(ApplicationDbContext context)
         {
             _context = context;
-        }      
+        }
 
         public async Task<Response<List<ContatoModel>>> GetContatos()
         {
@@ -25,9 +25,7 @@ namespace ContatoApi.Domain.Repositories
             {
                 Dados = lista,
                 Sucesso = true,
-                Mensagem = lista.Any()
-                    ? "Contatos recuperados com sucesso."
-                    : "Nenhum contato encontrado."
+                Mensagem = lista.Any() ? "Contatos recuperados com sucesso." : "Nenhum contato encontrado."
             };
         }
 
@@ -36,27 +34,36 @@ namespace ContatoApi.Domain.Repositories
             _context.Contatos.Add(novoContato);
             await _context.SaveChangesAsync();
 
-            // retorna a lista atualizada
             return await GetContatos();
         }
 
         public async Task<Response<ContatoModel>> GetContatosById(int id)
         {
-            var contato = await _context.Contatos.FindAsync(id);
-            if (contato == null)
-                return new Response<ContatoModel>
-                {
-                    Dados = null,
-                    Sucesso = false,
-                    Mensagem = "Contato não encontrado."
-                };
+            var response = new Response<ContatoModel>();
 
-            return new Response<ContatoModel>
+            try
             {
-                Dados = contato,
-                Sucesso = true,
-                Mensagem = "Contato encontrado."
-            };
+                var contato = await _context.Contatos
+                    .AsNoTracking() // Parar de dar o erro dos dois IDs duplicados.
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (contato == null)
+                {
+                    response.Sucesso = false;
+                    response.Mensagem = "Contato não encontrado.";
+                    return response;
+                }
+
+                response.Dados = contato;
+                response.Sucesso = true;
+            }
+            catch (Exception ex)
+            {
+                response.Sucesso = false;
+                response.Mensagem = ex.Message;
+            }
+
+            return response;
         }
 
         public async Task<Response<List<ContatoModel>>> UpdateContatos(ContatoModel ContatoEditado)
@@ -70,12 +77,15 @@ namespace ContatoApi.Domain.Repositories
         {
             var contato = await _context.Contatos.FindAsync(id);
             if (contato == null)
+            {
                 return new Response<List<ContatoModel>>
                 {
                     Dados = null,
                     Sucesso = false,
                     Mensagem = "Contato não encontrado."
                 };
+            }
+
 
             _context.Contatos.Remove(contato);
             await _context.SaveChangesAsync();
@@ -86,12 +96,15 @@ namespace ContatoApi.Domain.Repositories
         {
             var contato = await _context.Contatos.FindAsync(id);
             if (contato == null)
+            {
                 return new Response<List<ContatoModel>>
                 {
                     Dados = null,
                     Sucesso = false,
                     Mensagem = "Contato não encontrado."
                 };
+            }
+
 
             contato.Ativo = false;
             _context.Contatos.Update(contato);

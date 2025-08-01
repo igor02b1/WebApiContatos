@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ContatoApi.Application.Services
+namespace ContatoApi.Application.Interfaces
 {
     public interface IContatoServices
     {

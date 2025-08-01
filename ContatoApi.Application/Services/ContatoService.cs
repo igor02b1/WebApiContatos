@@ -1,5 +1,6 @@
-﻿using ContatoApi.Application.Utils;
-using ContatoApi.Application.Validators; // ⬅️ Atualizado para usar o seu método de extensão
+﻿using ContatoApi.Application.Interfaces;
+using ContatoApi.Application.Utils;
+using ContatoApi.Application.Validators;
 using ContatoApi.Domain.Models;
 using ContatoApi.Domain.Repositories;
 using System;
@@ -55,12 +56,21 @@ namespace ContatoApi.Application.Services
                     return response;
                 }
 
-                if (!CalcularIdade.UsuarioEhMaiorDeIdade(novoContato.DataNascimento))
+                if (!ValidarData.ValidacaoData(novoContato.DataNascimento))
                 {
                     response.Sucesso = false;
-                    response.Mensagem = "Contato deve ser maior de idade.";
+                    response.Mensagem = "A data de nascimento tem que ser menor que a data atual.";
                     return response;
                 }
+
+                if (!CalcularIdade.ContatoMaiorDeIdade(novoContato.DataNascimento))
+                {
+                    response.Sucesso = false;
+                    response.Mensagem = "Contato tem que ser maior de idade.";
+                    return response;
+                }
+
+                novoContato.Idade = CalcularIdade.CalcularContatoIdade(novoContato.DataNascimento);
 
                 await _contatoRepository.CreateContatos(novoContato);
 

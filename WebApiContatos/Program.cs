@@ -1,3 +1,4 @@
+using ContatoApi.Application.Interfaces;
 using ContatoApi.Application.Services;
 using ContatoApi.Domain.Repositories;
 using ContatoApi.Infrastructure.DataContext;

@@ -8,7 +8,7 @@ namespace ContatoApi.Application.Utils
 {
     public class CalcularIdade
     {
-        public static bool UsuarioEhMaiorDeIdade(DateTime dataNascimento)
+        public static int CalcularContatoIdade(DateTime dataNascimento)
         {
             var hoje = DateTime.Today;
             var idade = hoje.Year - dataNascimento.Year;
@@ -18,7 +18,13 @@ namespace ContatoApi.Application.Utils
                 idade--;
             }
 
-            return idade >= 18;
+            return idade;
+        }
+        public static bool ContatoMaiorDeIdade(DateTime dataNascimento)
+        {
+            var resultadoIdade = CalcularContatoIdade(dataNascimento);
+
+            return resultadoIdade >= 18;
         }
     }
 }
